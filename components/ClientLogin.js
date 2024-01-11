@@ -8,21 +8,23 @@ import {
     Image,
     StatusBar,
     ImageBackground,
-    Dimensions
+    Dimensions,
+    Alert
 } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import auth from '@react-native-firebase/auth';
 const { width, height } = Dimensions.get('window');
 import Icons from 'react-native-vector-icons/FontAwesome5';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setUser, getDomain } from './functions/helper';
 
 
 const ClientLogin = ({ navigation }) => {
     const [loading, setloading] = useState(false);
     const [initializing, setInitializing] = useState(true);
-    const [user, setUser] = useState();
-
+    // const [user, setUser] = useState();
     const [email, setemail] = useState('');
     const [pword, setpword] = useState('');
+    const [ip, setip] = useState('');
     const [emailinvalid, setemailinvalid] = useState(false);
 
     const [err, seterr] = useState(false);
@@ -41,36 +43,130 @@ const ClientLogin = ({ navigation }) => {
         else if (email.length === 0) return inValidator(true, 'Email required');
         else if (pword.length === 0)
             return inValidator(true, 'Password Field Cannot be left Empty');
-        else if (pword.length < 6)
-            return inValidator(true, 'Password Should at least be 6 characters');
+        // else if (pword.length < 6)
+        //     return inValidator(true, 'Password Should at least be 6 characters');
         else {
             setloading(true);
-            auth()
-                .signInWithEmailAndPassword(email, pword)
-                .then(() => {
-                    console.log('User signed in!');
-                    setloading(false);
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: 'LoggedInContainer' }],
-                    });
+            fetch('https://demo.vellas.net:94/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=')
+                .then(response => { console.log(response); return response.text() })
+                .then(datas => {
+                    const data = new URLSearchParams();
+                    data.append('method', 'loginCheck');
+                    data.append('data', JSON.stringify({ username: email, pwd: pword }));
+                    var domain = getDomain();
+                    console.log(domain + '/assettracking/webapp/php/index.php');
+
+                    fetch(domain + '/assettracking/webapp/php/index.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: data.toString()
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            console.log(data);
+                            var resp = typeof (data) == 'string' ? JSON.parse(data) : data;
+                            setloading(false);
+                            if (resp) {
+                                if (resp[0] == 'Login unsuccesfull' || resp[0] == 'Login failed') {
+                                    Alert.alert(resp[0]);
+                                    AsyncStorage.removeItem('username');
+                                    AsyncStorage.removeItem('password');
+                                }
+                                else {
+                                    AsyncStorage.setItem('username', email);
+                                    AsyncStorage.setItem('password', pword);
+                                    setUser({ username: email, pwd: pword })
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'LoggedInContainer' }],
+                                    });
+                                }
+                            }
+
+
+                        })
+                        .catch(error => {
+                            alert('Error:', error);
+                            console.log('Error:', error);
+                            setloading(false);
+
+                        });
                 })
-                .catch(error => {
-                    console.log(error);
 
-                    if (error.code === 'auth/user-not-found')
-                        inValidator(true, 'Incorrect Credentials');
-                    else if (error.code === 'auth/invalid-login')
-                        inValidator(true, 'Invalid Login');
 
-                    setloading(false);
-                });
+
+
+
+            // console.log('https://aperia.vellas.net:6642/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=')
+
+
         }
     };
     const validateEmail = () => {
         var re = /\S+@\S+\.\S+/;
         return re.test(email);
     };
+
+    useEffect(() => {
+        checkLogin();
+    }, []);
+
+    const checkLogin = async () => {
+        var user = await AsyncStorage.getItem('username');
+        var pwd = await AsyncStorage.getItem('password');
+        // var ipport = await AsyncStorage.getItem('ip');
+        if (user && pwd) {
+            fetch('https://demo.vellas.net:94/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=')
+                .then(response => { return response.text() })
+                .then(datas => {
+                    var domain = getDomain();
+                    console.log(domain + '/assettracking/webapp/php/index.php');
+                    const data = new URLSearchParams();
+                    data.append('method', 'loginCheck');
+                    data.append('data', JSON.stringify({ username: user, pwd: pwd }));
+                    fetch(domain + '/assettracking/webapp/php/index.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: data.toString()
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            console.log(typeof (data));
+                            var resp = typeof (data) == 'string' ? JSON.parse(data) : data;
+                            setloading(false);
+                            if (resp) {
+                                if (resp[0] == 'Login unsuccesfull' || resp[0] == 'Login failed') {
+                                    Alert.alert(resp[0]);
+                                    AsyncStorage.removeItem('username');
+                                    AsyncStorage.removeItem('password');
+                                }
+                                else {
+                                    AsyncStorage.setItem('username', user);
+                                    AsyncStorage.setItem('password', pwd);
+                                    setUser({ username: user, pwd: pwd })
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'LoggedInContainer' }],
+                                    });
+                                }
+                            }
+
+
+                        })
+                        .catch(error => {
+                            alert('Error:', error);
+                            console.log('Error:', error);
+                            setloading(false);
+
+                        });
+                })
+
+        }
+    }
 
 
     return (

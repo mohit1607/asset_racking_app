@@ -12,13 +12,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import auth from '@react-native-firebase/auth';
 import Home from './components/Home';
 import AssetTracking from './components/AssetTracking';
 import LocationAsset from './components/LocationAsset';
 import ClientLogin from './components/ClientLogin';
 import Comparison from './components/Comparison';
 import LocationDetails from './components/LocationDetails';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Stack = createNativeStackNavigator();
 export default function App() {
   const [initializing, setInitializing] = useState(true);
@@ -28,21 +29,12 @@ export default function App() {
   const [initialRoute, setinitialRoute] = useState('');
 
 
-  function onAuthStateChanged(user) {
-    // setUser(user);
-    const { currentUser } = auth();
-    console.log(currentUser)
-    if (currentUser) {
-      setinitialRoute('LoggedInContainer');
-    } else {
-
-      setinitialRoute('ClientSign');
-    }
+  const onAuthStateChanged = async () => {
+    setinitialRoute('ClientSign');
   }
 
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    onAuthStateChanged();
   }, []);
 
 
@@ -61,7 +53,7 @@ export default function App() {
         <Stack.Screen name="AssetTracking" component={AssetTracking} />
         <Stack.Screen name="LocationAsset" component={LocationAsset} />
         <Stack.Screen name="LocationDetails" component={LocationDetails} />
-        <Stack.Screen name="Comparison" component={Comparison} />
+        <Stack.Screen options={{ orientation: 'landscape' }} name="Comparison" component={Comparison} />
       </Stack.Navigator>
     );
   };

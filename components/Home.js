@@ -2,29 +2,32 @@ import { View, Text, TouchableOpacity, ScrollView, Modal, Dimensions, TextInput,
 import React, { useState, useRef, useEffect } from 'react'
 const { width, height } = Dimensions.get('window');
 import Icons from 'react-native-vector-icons/FontAwesome';
-import auth from '@react-native-firebase/auth';
+import { getUser } from './functions/helper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation }) => {
 
     const [loading, setloading] = useState(false);
-    const [user, setuser] = useState(null);
+    const [user, setuser] = useState(getUser());
 
     useEffect(() => {
-        const { currentUser } = auth();
-        console.log(currentUser)
-        if (currentUser) {
-            setuser(currentUser.email)
-        } else {
+        // const { currentUser } = auth();
+        // console.log(currentUser)
+        // if (currentUser) {
+        //     setuser(currentUser.email)
+        // } else {
 
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'ClientSign' }],
-            });
-        }
+        //     navigation.reset({
+        //         index: 0,
+        //         routes: [{ name: 'ClientSign' }],
+        //     });
+        // }
     }, [])
 
     const onLogOut = () => {
-        auth().signOut();
+        // auth().signOut();
+        AsyncStorage.removeItem('username');
+        AsyncStorage.removeItem('password');
         navigation.reset({
             index: 0,
             routes: [{ name: 'ClientSign' }],
@@ -44,7 +47,7 @@ const Home = ({ navigation }) => {
                     <View style={{ paddingHorizontal: 30, flex: 1, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                         {/* <Icons name="user-circle-o" size={width * 0.5} color={'#000'} /> */}
                         <Text style={{ color: '#000', textAlign: 'center', fontSize: width / 13, paddingTop: 10 }}>Welcome,</Text>
-                        <Text style={{ color: '#000', textAlign: 'center', fontSize: width / 13, paddingTop: 10 }}>{user}</Text>
+                        <Text style={{ color: '#000', textAlign: 'center', fontSize: width / 13, paddingTop: 10 }}>{user.username}</Text>
                         <View style={{ marginHorizontal: 20, marginTop: 10 }}>
 
                             <TouchableOpacity
@@ -97,7 +100,7 @@ const Home = ({ navigation }) => {
                                 </View>
                             </View>
                         </View>
-                        <View style={{ width: '100%', justifyContent: 'flex-start', marginTop: 30 }}>
+                        {/* <View style={{ width: '100%', justifyContent: 'flex-start', marginTop: 30 }}>
                             <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 13, fontWeight: 'bold', paddingTop: 10 }}>Cloud Data</Text>
                             <View style={{ backgroundColor: '#fff', borderRadius: 15, padding: 10 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
@@ -111,7 +114,7 @@ const Home = ({ navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        </View>
+                        </View> */}
                     </View>
                 </ScrollView>
             </ImageBackground>

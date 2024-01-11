@@ -2,13 +2,14 @@ import { View, Text, TouchableOpacity, ScrollView, Modal, Dimensions, TextInput,
 import React, { useState, useRef, useEffect } from 'react'
 const { width, height } = Dimensions.get('window');
 import Icons from 'react-native-vector-icons/FontAwesome';
-import auth from '@react-native-firebase/auth';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
+import { getDomainSAP } from './functions/helper';
+
 const LocationDetails = ({ navigation }) => {
 
     const [loading, setloading] = useState(false);
-    const [asset, setasset] = useState({ id: 'XX XXX XXXX', name: 'XX XXX XXX', location: 'XX XX XXX' });
+    const [asset, setasset] = useState('');
     const [assetDetails, setassetDetails] = useState([]);
     const camerRef = useRef(null)
 
@@ -21,17 +22,25 @@ const LocationDetails = ({ navigation }) => {
             // setloading(false)
             console.log(e.data)
             var jData = JSON.parse(e.data);
-            if (jData && jData.id) {
-                setasset(jData);
-                const url = `https://demo.vellas.net:94/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=${jData.id}&assetcode=`;
+            if (jData && jData.Location) {
+                var domain = getDomainSAP();
+                setasset(jData.Location);
+                const url = `${domain}/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=${jData.Location}&assetcode=`;
                 console.log(url);
                 fetch(url)
-                    .then(res => res.json())
+                    .then(res => res.text())
                     .then(data => {
+
                         console.log(data);
+                        var resp = typeof (data) == 'string' ? JSON.parse(data) : data;
                         // if (data && JSON.parse(data).length > 0) {
 
-                        setassetDetails(data)
+                        if (resp[0]) {
+                            setassetDetails(resp)
+                        }
+                        else {
+                            Alert.alert('Data not found in SAP')
+                        }
                         // }
                         // else {
                         //     // Alert.alert('Wrong credentials!')
@@ -67,7 +76,7 @@ const LocationDetails = ({ navigation }) => {
                             markerStyle={{ width: 180, height: 180, borderRadius: 8 }}
                             onRead={onSuccess}
                             showMarker={true}
-                            flashMode={RNCamera.Constants.FlashMode.torch}
+                            flashMode={RNCamera.Constants.FlashMode.off}
 
                         />
                         <View style={{ marginHorizontal: 20, marginTop: 10 }}>
@@ -91,14 +100,14 @@ const LocationDetails = ({ navigation }) => {
                             <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 13, fontWeight: 'bold', paddingTop: 10 }}>Location Information</Text>
                             <View style={{ backgroundColor: '#fff', borderRadius: 15, padding: 10, marginTop: 10 }}>
                                 <View style={{ marginBottom: 10 }}>
-                                    <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Location Id</Text>
-                                    <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{asset.id}</Text>
+                                    <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Location Name</Text>
+                                    <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{asset}</Text>
 
                                 </View>
-                                <View style={{ marginBottom: 10 }}>
+                                {/* <View style={{ marginBottom: 10 }}>
                                     <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Location Name</Text>
                                     <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{asset.location}</Text>
-                                </View>
+                                </View> */}
                             </View>
                         </View>
 
@@ -107,7 +116,7 @@ const LocationDetails = ({ navigation }) => {
                             {assetDetails && assetDetails.map((value, index) => {
                                 return <View key={index} style={{ backgroundColor: '#fff', borderRadius: 15, padding: 10, marginTop: 10 }}>
                                     <View style={{ marginBottom: 10 }}>
-                                        <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Asset Tag</Text>
+                                        <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Asset Serial No.</Text>
                                         <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{value.AssetTag}</Text>
 
                                     </View>
@@ -115,10 +124,10 @@ const LocationDetails = ({ navigation }) => {
                                         <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Asset Name</Text>
                                         <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{value.AssetName}</Text>
                                     </View>
-                                    <View style={{ marginBottom: 10 }}>
+                                    {/* <View style={{ marginBottom: 10 }}>
                                         <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Asset Model</Text>
                                         <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{value.FrgnName}</Text>
-                                    </View>
+                                    </View> */}
                                 </View>
                             })}
                         </View>}

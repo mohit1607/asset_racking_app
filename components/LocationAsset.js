@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity, ScrollView, Modal, Dimensions, TextInput,
 import React, { useState, useRef, useEffect } from 'react'
 const { width, height } = Dimensions.get('window');
 import Icons from 'react-native-vector-icons/FontAwesome';
-import auth from '@react-native-firebase/auth';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 const LocationAsset = ({ navigation }) => {
@@ -81,7 +80,7 @@ const LocationAsset = ({ navigation }) => {
                             markerStyle={{ width: 180, height: 180, borderRadius: 8 }}
                             onRead={onSuccess}
                             showMarker={true}
-                            flashMode={RNCamera.Constants.FlashMode.torch}
+                            flashMode={RNCamera.Constants.FlashMode.off}
 
                         />
                         <View style={{ marginHorizontal: 20, marginTop: 10 }}>
@@ -114,13 +113,13 @@ const LocationAsset = ({ navigation }) => {
                                     </View> */}
                                     <View >
                                         <View style={{ marginBottom: 10 }}>
-                                            <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Id: {value.id}</Text>
+                                            <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Name: {value.Location}</Text>
 
                                         </View>
-                                        <View style={{ marginBottom: 10 }}>
+                                        {/* <View style={{ marginBottom: 10 }}>
                                             <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Location: {value.location}</Text>
 
-                                        </View>
+                                        </View> */}
                                         <TouchableOpacity
                                             onPress={() => {
                                                 camerRef.current.reactivate()
@@ -169,10 +168,10 @@ const LocationAsset = ({ navigation }) => {
                                             </TouchableOpacity>
                                         </View>
                                         <View style={{ marginBottom: 10 }}>
-                                            <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Tag: {value.AssetTag}</Text>
+                                            <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Tag: {value.Asset}</Text>
 
                                         </View>
-                                        <View style={{ marginBottom: 10 }}>
+                                        {/* <View style={{ marginBottom: 10 }}>
                                             <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Name: {value.AssetName}</Text>
 
                                         </View>
@@ -183,7 +182,7 @@ const LocationAsset = ({ navigation }) => {
                                         <View style={{ marginBottom: 10 }}>
                                             <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10 }}>Location: {value.LocationName}</Text>
 
-                                        </View>
+                                        </View> */}
                                     </View>
                                 })}
                             </View>}

@@ -10,9 +10,6 @@ import {
     StatusBar
 } from 'react-native';
 import React, { useRef, useEffect, useState } from 'react';
-import firestore from '@react-native-firebase/firestore';
-
-import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setUser, setDomain } from './functions/helper';
 
@@ -32,25 +29,6 @@ const Login = ({ navigation }) => {
     useEffect(() => {
         setloading(true);
 
-        const user = auth().currentUser;
-        console.log('user', user);
-        if (user.uid) {
-            console.log(user.uid);
-            setlogUser(user.email)
-            firestore().collection('users_access').doc(user.uid).get().then(document => {
-                console.log(document.data().url);
-                setloading(false);
-                domain.current = document.data().url;
-                setDomain(document.data().url);
-
-                checkLogin();
-            }).catch();
-        }
-        else {
-            setloading(false);
-            auth().signOut();
-
-        }
     }, []);
     const inValidator = (err, msg) => {
         seterr(true), seterrmsg(msg);
@@ -138,7 +116,6 @@ const Login = ({ navigation }) => {
         return re.test(email);
     };
     const onLogOut = () => {
-        auth().signOut();
         navigation.reset({
             index: 0,
             routes: [{ name: 'ClientSign' }],
