@@ -36,8 +36,8 @@ const AssetTracking = ({ navigation }) => {
                         // if (data && JSON.parse(data).length > 0) {
 
                         if (resp[0]) {
-                            resp[0].LocationName = resp[0].Location;
-                            delete (resp[0].Location)
+                            // resp[0].Location = resp[0].Location;
+                            // delete (resp[0].Location)
                             setasset({ ...jData, ...resp[0] })
                         }
                         else {
@@ -123,7 +123,7 @@ const AssetTracking = ({ navigation }) => {
                                 </View> */}
                                 <View style={{ marginBottom: 10 }}>
                                     <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, paddingLeft: 10, marginBottom: 10 }}>Asset Location</Text>
-                                    <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{asset.LocationName}</Text>
+                                    <Text style={{ color: '#000', textAlign: 'left', fontSize: width / 18, borderWidth: 1, padding: 10, borderColor: '#rgba(0,0,0,0.4)' }}>{asset.Location}</Text>
 
                                 </View>
                             </View>

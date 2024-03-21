@@ -24,10 +24,22 @@ const LocationAsset = ({ navigation }) => {
             var jData = JSON.parse(e.data);
             if (jData) {
                 if (showLocation) {
-                    setasset([jData])
+                    if (jData.Location) {
+                        setasset([jData])
+                    }
+                    else {
+                        Alert.alert('Invalid data')
+                    }
                 }
                 else {
-                    setassetDetails([...assetDetails, jData])
+                    if (jData.Asset) {
+                        jData.Location = asset[0].Location;
+                        console.log('asset', jData)
+                        setassetDetails([...assetDetails, jData])
+                    }
+                    else {
+                        Alert.alert('Invalid data')
+                    }
                 }
             }
             else {
