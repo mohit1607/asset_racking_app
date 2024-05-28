@@ -54,7 +54,7 @@ const ClientLogin = ({ navigation }) => {
                     data.append('method', 'loginCheck');
                     data.append('data', JSON.stringify({ username: email, pwd: pword }));
                     var domain = getDomain();
-                    console.log(domain + '/assettracking/webapp/php/index.php');
+                    console.log(domain + '/assettracking/webapp/php/index.php', "login dummy");
 
                     fetch(domain + '/assettracking/webapp/php/index.php', {
                         method: 'POST',
