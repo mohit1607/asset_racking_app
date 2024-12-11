@@ -47,52 +47,52 @@ const ClientLogin = ({ navigation }) => {
         //     return inValidator(true, 'Password Should at least be 6 characters');
         else {
             setloading(true);
-            fetch('https://demo.vellas.net:99/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=')
-                .then(response => { console.log(response); return response.text() })
-                .then(datas => {
-                    const data = new URLSearchParams();
-                    data.append('method', 'loginCheck');
-                    data.append('data', JSON.stringify({ username: email, pwd: pword }));
-                    var domain = getDomain();
-                    console.log(domain + '/assettracking/webapp/php/index.php', "login dummy");
+            // fetch('https://demo.vellas.net:99/sap_api/api/values/GetAssetlist?token=743F1F69-168A-489E-BC19-5ABF98E8000B&location=')
+            //     .then(response => { console.log(response); return response.text() })
+            //     .then(datas => {
+            // })
+            // .catch(error => {
+            //     alert('Error:', error);
+            //     console.log('Error:', error);
+            //     setloading(false);
 
-                    fetch(domain + '/assettracking/webapp/php/index.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: data.toString()
-                    })
-                        .then(response => response.text())
-                        .then(data => {
-                            console.log(data);
-                            var resp = typeof (data) == 'string' ? JSON.parse(data) : data;
-                            setloading(false);
-                            if (resp) {
-                                if (resp[0] == 'Login unsuccesfull' || resp[0] == 'Login failed') {
-                                    Alert.alert(resp[0]);
-                                    AsyncStorage.removeItem('username');
-                                    AsyncStorage.removeItem('password');
-                                }
-                                else {
-                                    AsyncStorage.setItem('username', email);
-                                    AsyncStorage.setItem('password', pword);
-                                    setUser({ username: email, pwd: pword })
-                                    navigation.reset({
-                                        index: 0,
-                                        routes: [{ name: 'LoggedInContainer' }],
-                                    });
-                                }
-                            }
+            // });
+            const data = new URLSearchParams();
+            data.append('method', 'loginCheck');
+            data.append('data', JSON.stringify({ username: email, pwd: pword }));
+            var domain = getDomain();
+            console.log(domain + '/assettracking/webapp/php/index.php', "login dummy");
+
+            fetch(domain + '/assettracking/webapp/php/index.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data.toString()
+            })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                    var resp = typeof (data) == 'string' ? JSON.parse(data) : data;
+                    setloading(false);
+                    if (resp) {
+                        if (resp[0] == 'Login unsuccesfull' || resp[0] == 'Login failed') {
+                            Alert.alert(resp[0]);
+                            AsyncStorage.removeItem('username');
+                            AsyncStorage.removeItem('password');
+                        }
+                        else {
+                            AsyncStorage.setItem('username', email);
+                            AsyncStorage.setItem('password', pword);
+                            setUser({ username: email, pwd: pword })
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'LoggedInContainer' }],
+                            });
+                        }
+                    }
 
 
-                        })
-                        .catch(error => {
-                            alert('Error:', error);
-                            console.log('Error:', error);
-                            setloading(false);
-
-                        });
                 })
                 .catch(error => {
                     alert('Error:', error);
